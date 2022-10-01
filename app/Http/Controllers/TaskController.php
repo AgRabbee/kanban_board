@@ -12,18 +12,24 @@ class TaskController extends Controller
         $all_tasks = Task::all()->toArray();
         $returnDataArr = [];
 
-        foreach ($all_tasks as $task) {
-            if ($task['status_id'] == 1) {
-                $returnDataArr['todoArr'][] = $task;
+        try{
+            foreach ($all_tasks as $task) {
+                if ($task['status_id'] == 1) {
+                    $returnDataArr['todoArr'][] = $task;
+                }
+                if ($task['status_id'] == 2) {
+                    $returnDataArr['in_progressArr'][] = $task;
+                }
+                if ($task['status_id'] == 3) {
+                    $returnDataArr['doneArr'][] = $task;
+                }
             }
-            if ($task['status_id'] == 2) {
-                $returnDataArr['in_progressArr'][] = $task;
-            }
-            if ($task['status_id'] == 3) {
-                $returnDataArr['doneArr'][] = $task;
-            }
+            return response()->json(['responseCode' => 1, 'status' => 'success', 'msg' => 'Data found', 'data' => $returnDataArr]);
         }
-        return response()->json(['responseCode' => 1, 'status' => 'success', 'msg' => 'Data found', 'data' => $returnDataArr]);
+        catch (\Exception $e){
+            return response()->json(['responseCode' => -1, 'status' => 'failed', 'msg' => 'Data not found', 'data' => []]);
+        }
+
     }
 
     public function store(Request $request)
