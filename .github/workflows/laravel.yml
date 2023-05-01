@@ -1,39 +1,47 @@
-name: Laravel
-
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    branches: [ 'master' ]
 
+name: 🚀 Deployment
 jobs:
-  laravel-tests:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
-      with:
-        php-version: '7.3'
-    - uses: actions/checkout@v3
-    - name: Copy .env
-      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-    - name: Install Dependencies
-      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-    - name: Directory Permissions
-      run: chmod -R 777 storage bootstrap/cache
-
   web-deploy:
     name: 🎉 Deploy
     runs-on: ubuntu-latest
     steps:
       - name: 🚚 Get latest code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Config Clearing
+        run: php artisan config:clear
+
+      - name: Cache Clearing
+        run: php artisan cache:clear
+
+      - name: Generate App Key
+        run: php artisan key:generate
+
+      - name: Generate storage link
+        run: php artisan storage:link
+
+      - name: Directory Permissions
+        run: chmod -R 777 storage bootstrap/cache
+
+#      - name: Install Npm
+#        run: npm install
+#
+#      - name: Compile Css and Js Assets
+#        run: npm run build
 
       - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
           server: ftp.humanityfirstbd.org
           username: ${{ secrets.ftp_username }}
           password: ${{ secrets.ftp_password }}
-          server-dir: kanban.humanityfirstbd.org/
+          server-dir: /kanban.humanityfirstbd.org/
