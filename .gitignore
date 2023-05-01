@@ -16,7 +16,7 @@ npm-debug.log
 yarn-error.log
 .idea
 .styleci.yml
-composer.lock
+#composer.lock
 package-lock.json
 phpunit.xml
 tests
